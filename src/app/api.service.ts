@@ -7,6 +7,7 @@ export interface UserProfile { mobileNumber: string; name: string; address?: str
 export interface RubberPrice { id: number; priceDate: string; quality: string; price: number; }
 export interface PaymentPlan { amount?: number; price?: number; currency?: string; name?: string; duration?: string; [key: string]: unknown; }
 export interface PaymentStatus { status?: 'S' | 'P' | 'F' | string; paymentReference?: string; transactionRef?: string; remarks?: string; [key: string]: unknown; }
+export interface CashfreeOrder { orderId?: string; paymentSessionId?: string; cashfreeOrderId?: string; subscriptionStatus?: string; [key: string]: unknown; }
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -23,6 +24,7 @@ export class ApiService {
   monthlyPrices(year: number, month: number): Observable<RubberPrice[]> { return this.withTimeout(this.http.get<RubberPrice[] | { data: RubberPrice[] }>(`${this.baseUrl}/price/monthly?year=${year}&month=${month}`, { headers: this.headers() })).pipe(map((response) => this.unwrap(response))); }
   subscriptionPlan(): Observable<PaymentPlan> { return this.withTimeout(this.http.get<PaymentPlan | { data: PaymentPlan }>(`${this.baseUrl}/payment/plan`, { headers: this.headers() })).pipe(map((response) => this.unwrap(response))); }
   createPaymentOrder(body: { gateway: string }): Observable<any> { return this.withTimeout(this.http.post(`${this.baseUrl}/payment/create-order`, body, { headers: this.headers() })); }
+  verifyPayment(body: { gatewayPaymentId: string; remarks: string }): Observable<any> { return this.withTimeout(this.http.post(`${this.baseUrl}/payment/verify`, body, { headers: this.headers() })); }
   submitPayment(body: { transactionRef: string; remarks: string }): Observable<any> { return this.withTimeout(this.http.post(`${this.baseUrl}/payment/submit`, body, { headers: this.headers() })); }
   paymentStatus(): Observable<PaymentStatus> { return this.withTimeout(this.http.get<PaymentStatus | { data: PaymentStatus }>(`${this.baseUrl}/payment/status`, { headers: this.headers() })).pipe(map((response) => this.extractPaymentStatus(response))); }
   adminVerifyPayment(body: { paymentReference: string; status: 'S' | 'P' | 'F'; remarks: string }): Observable<any> { return this.withTimeout(this.http.post(`${this.baseUrl}/payment/admin/verify`, body, { headers: this.headers() })); }
@@ -48,7 +50,7 @@ export class ApiService {
   extractPaymentStatus(response: any): PaymentStatus {
     const value = response?.data ?? response ?? {};
     if (typeof value === 'string') return { status: value };
-    return { ...value, status: value.status ?? value.paymentStatus ?? value.payment_status };
+    return { ...value, status: value.status ?? value.subscriptionStatus ?? value.paymentStatus ?? value.payment_status };
   }
   setPaymentPending(): void { localStorage.setItem(this.pendingKey, 'true'); }
   clearPaymentPending(): void { localStorage.removeItem(this.pendingKey); }

@@ -10,8 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
-import QRCode from 'qrcode';
-import { ApiService, PaymentPlan, PaymentStatus, RubberPrice, UserProfile } from './api.service';
+import { ApiService, CashfreeOrder, PaymentPlan, PaymentStatus, RubberPrice, UserProfile } from './api.service';
 import { Language, LanguageService } from './language.service';
 import { TranslatePipe } from './translate.pipe';
 
@@ -42,7 +41,8 @@ export class App implements OnInit, OnDestroy {
   readonly paymentPlan = signal<PaymentPlan | null>(null);
   readonly paymentStatus = signal<PaymentStatus | null>(null);
   readonly recentPrediction = signal<any>(null);
-  readonly qrCode = signal('');
+  readonly cashfreeOrder = signal<CashfreeOrder | null>(null);
+  readonly paymentSessionId = signal('');
   readonly error = signal('');
   readonly whatsappNumber = '919842630047';
   readonly whatsappMessage = 'I am planning to sell rubber sheets';
@@ -150,12 +150,17 @@ export class App implements OnInit, OnDestroy {
     this.paymentSubmitted.set(false);
     this.paymentStatus.set(null);
     this.loading.set(true);
-    QRCode.toDataURL('LATEXF|RUBBER|MONTHLY|UPI:latex@upi', { width: 220, margin: 2, color: { dark: '#173b32', light: '#ffffff' } }).then((code: string) => this.qrCode.set(code));
     this.api.subscriptionPlan().subscribe({
       next: (plan) => {
         this.paymentPlan.set(plan);
-        this.api.createPaymentOrder({ gateway: 'RAZORPAY' }).subscribe({
-          next: (order) => { this.api.saveOrderId(order); this.loading.set(false); },
+        this.api.createPaymentOrder({ gateway: 'CASHFREE' }).subscribe({
+          next: (response) => {
+            const order = (response?.data ?? response) as CashfreeOrder;
+            this.cashfreeOrder.set(order);
+            this.paymentSessionId.set(String(order.paymentSessionId ?? ''));
+            this.api.saveOrderId(order);
+            this.loading.set(false);
+          },
           error: (e) => this.fail(e, 'Unable to create the payment order.')
         });
       },
@@ -163,18 +168,19 @@ export class App implements OnInit, OnDestroy {
     });
   }
 
+  startCashfreeCheckout(): void {
+    if (!this.paymentSessionId()) { this.error.set('Cashfree payment session is not ready yet.'); return; }
+    Cashfree({ mode: 'sandbox' }).checkout({ paymentSessionId: this.paymentSessionId(), redirectTarget: '_self' });
+  }
+
   markPaymentDone(): void {
     this.loading.set(true);
-    this.api.adminVerifyPayment({
-      paymentReference: this.api.orderId(),
-      status: 'S',
-      remarks: 'User completed payment via UPI'
-    }).subscribe({
+    this.api.verifyPayment({ gatewayPaymentId: this.api.orderId(), remarks: 'Cashfree checkout completed' }).subscribe({
       next: (response) => {
         const status = this.api.extractPaymentStatus(response);
         this.paymentStatus.set(status);
         this.paymentPlan.update((plan) => ({ ...(plan ?? {}), ...status }));
-        if (status.status === 'S') {
+        if (status.status === 'ACTIVE' || status.status === 'S' || (status as any).smsStatus === 'ACTIVE' || (status as any).rubberPriceEnabled === true) {
           this.paymentSubmitted.set(false);
           this.api.clearPaymentPending();
           this.loading.set(false);
