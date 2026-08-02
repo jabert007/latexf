@@ -249,7 +249,7 @@ export class App implements OnInit, OnDestroy {
   }
   isPlanPending(): boolean { return this.planStatus() === 'P'; }
   isPending(): boolean { return !this.isSubscribed() && (this.isPlanPending() || this.paymentSubmitted() || this.api.paymentPending()); }
-  planAmount(): number { return Number(this.paymentPlan()?.amount ?? this.paymentPlan()?.price ?? 5); }
+  planAmount(): number { return 10; }
   planName(): string { const plan = this.paymentPlan() as any; return String(plan?.name ?? plan?.planName ?? 'Active subscription'); }
   priceDate(): string { return this.prices()[0]?.priceDate || ''; }
   sortedMonthlyPrices(): RubberPrice[] { return [...this.monthlyPrices()].sort((a, b) => a.price - b.price); }
