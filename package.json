@@ -1,0 +1,41 @@
+{
+  "name": "untitled",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "node -r ./scripts/angular-node-compat.cjs ./node_modules/@angular/cli/bin/ng.js serve --proxy-config proxy.conf.json",
+    "build": "node -r ./scripts/angular-node-compat.cjs ./node_modules/@angular/cli/bin/ng.js build",
+    "watch": "node -r ./scripts/angular-node-compat.cjs ./node_modules/@angular/cli/bin/ng.js build --watch --configuration development",
+    "test": "ng test",
+    "cap:init": "cap init LATEXF com.latexf.app",
+    "cap:sync": "cap sync",
+    "cap:android": "cap open android"
+  },
+  "private": true,
+  "packageManager": "npm@11.0.0",
+  "dependencies": {
+    "@angular/cdk": "^22.1.0",
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
+    "@angular/material": "^22.1.0",
+    "@angular/platform-browser": "^22.1.0",
+    "@angular/router": "^22.1.0",
+    "@capacitor/core": "^8.5.0",
+    "qrcode": "^1.5.4",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.1.2",
+    "@angular/cli": "^22.1.2",
+    "@angular/compiler-cli": "^22.1.0",
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "jsdom": "^28.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2",
+    "vitest": "^4.0.8"
+  }
+}
