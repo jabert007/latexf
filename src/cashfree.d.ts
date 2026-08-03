@@ -1,5 +1,10 @@
-declare interface CashfreeCheckout {
-  checkout(options: { paymentSessionId: string; redirectTarget?: '_self' | '_blank' | '_modal' }): Promise<unknown>;
-}
+declare module '@cashfreepayments/cashfree-js' {
+  export interface CashfreeCheckout {
+    checkout(options: {
+      paymentSessionId: string;
+      redirectTarget?: '_self' | '_blank' | '_modal';
+    }): Promise<unknown>;
+  }
 
-declare function Cashfree(options: { mode: 'sandbox' | 'production' }): CashfreeCheckout;
+  export function load(options: { mode: 'sandbox' | 'production' }): Promise<CashfreeCheckout | null>;
+}

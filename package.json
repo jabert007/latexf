@@ -23,6 +23,7 @@
     "@angular/platform-browser": "^22.1.0",
     "@angular/router": "^22.1.0",
     "@capacitor/core": "^8.5.0",
+    "@cashfreepayments/cashfree-js": "^1.0.7",
     "qrcode": "^1.5.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"

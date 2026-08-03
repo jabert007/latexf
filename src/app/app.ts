@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { load } from '@cashfreepayments/cashfree-js';
 import { ApiService, CashfreeOrder, PaymentPlan, PaymentStatus, RubberPrice, UserProfile } from './api.service';
 import { Language, LanguageService } from './language.service';
 import { TranslatePipe } from './translate.pipe';
@@ -168,9 +169,15 @@ export class App implements OnInit, OnDestroy {
     });
   }
 
-  startCashfreeCheckout(): void {
+  async startCashfreeCheckout(): Promise<void> {
     if (!this.paymentSessionId()) { this.error.set('Cashfree payment session is not ready yet.'); return; }
-    Cashfree({ mode: 'sandbox' }).checkout({ paymentSessionId: this.paymentSessionId(), redirectTarget: '_self' });
+    try {
+      const cashfree = await load({ mode: 'sandbox' });
+      if (!cashfree) { this.error.set('Cashfree checkout could not be loaded.'); return; }
+      cashfree.checkout({ paymentSessionId: this.paymentSessionId(), redirectTarget: '_modal' });
+    } catch {
+      this.error.set('Cashfree checkout could not be loaded. Please try again.');
+    }
   }
 
   markPaymentDone(): void {
