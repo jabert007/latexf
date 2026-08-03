@@ -154,7 +154,7 @@ export class App implements OnInit, OnDestroy {
     this.api.subscriptionPlan().subscribe({
       next: (plan) => {
         this.paymentPlan.set(plan);
-        this.api.createPaymentOrder({ gateway: 'CASHFREE' }).subscribe({
+        this.api.createPaymentOrder({ gateway: 'CASHFREE', mobileNumber: this.profile()?.mobileNumber ?? '' }).subscribe({
           next: (response) => {
             const order = (response?.data ?? response) as CashfreeOrder;
             this.cashfreeOrder.set(order);
