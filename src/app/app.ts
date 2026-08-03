@@ -171,11 +171,16 @@ export class App implements OnInit, OnDestroy {
 
   async startCashfreeCheckout(): Promise<void> {
     if (!this.paymentSessionId()) { this.error.set('Cashfree payment session is not ready yet.'); return; }
+    this.loading.set(true);
     try {
       const cashfree = await load({ mode: 'sandbox' });
-      if (!cashfree) { this.error.set('Cashfree checkout could not be loaded.'); return; }
-      cashfree.checkout({ paymentSessionId: this.paymentSessionId(), redirectTarget: '_modal' });
+      if (!cashfree) { this.loading.set(false); this.error.set('Cashfree checkout could not be loaded.'); return; }
+      await cashfree.checkout({ paymentSessionId: this.paymentSessionId(), redirectTarget: '_modal' });
+      // Cashfree has completed/closed the checkout. Let the backend confirm the
+      // order, then continue through the same flow as “I’ve completed payment”.
+      this.markPaymentDone();
     } catch {
+      this.loading.set(false);
       this.error.set('Cashfree checkout could not be loaded. Please try again.');
     }
   }
