@@ -253,7 +253,11 @@ export class App implements OnInit, OnDestroy {
     return plan?.active === true || plan?.subscriptionActive === true || plan?.hasActiveSubscription === true
       || !!plan?.activeSubscription || ['ACTIVE', 'SUCCESS', 'S'].includes(status);
   }
-  smsEnabled(): boolean { return !!this.profile()?.smsAlertEnabled; }
+  smsEnabled(): boolean {
+    const plan = this.paymentPlan() as any;
+    const smsStatus = String(plan?.smsStatus ?? plan?.sms_status ?? '').toUpperCase();
+    return !!this.profile()?.smsAlertEnabled || plan?.smsAlertEnabled === true || smsStatus === 'ACTIVE';
+  }
   planStatus(): string { const plan = this.paymentPlan() as any; return String(plan?.status ?? plan?.paymentStatus ?? plan?.payment_status ?? '').toUpperCase(); }
   hasPaymentRecord(): boolean {
     const plan = this.paymentPlan() as any;
