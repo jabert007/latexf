@@ -3,15 +3,21 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Capacitor } from '@capacitor/core';
 import { Observable, map, timeout } from 'rxjs';
 
+interface LatexfRuntimeConfig { apiBaseUrl?: string; }
+
+declare global {
+  interface Window { __LATEXF_CONFIG__?: LatexfRuntimeConfig; }
+}
+
 export interface UserProfile { mobileNumber: string; name: string; address?: string; state?: string; district?: string; pincode?: string; subscriptionActive?: boolean; subscriptionEndDate?: string; smsAlertEnabled?: boolean; }
 export interface RubberPrice { id: number; priceDate: string; quality: string; price: number; }
 export interface PaymentPlan { amount?: number; price?: number; currency?: string; name?: string; duration?: string; [key: string]: unknown; }
 export interface PaymentStatus { status?: 'S' | 'P' | 'F' | string; paymentReference?: string; transactionRef?: string; remarks?: string; [key: string]: unknown; }
-export interface CashfreeOrder { orderId?: string; paymentSessionId?: string; cashfreeOrderId?: string; subscriptionStatus?: string; [key: string]: unknown; }
+export interface CashfreeOrder { orderId?: string; order_id?: string; paymentSessionId?: string; payment_session_id?: string; cashfreeOrderId?: string; subscriptionStatus?: string; [key: string]: unknown; }
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = Capacitor.isNativePlatform() ? 'http://10.0.2.2:8080/api/v1' : 'http://localhost:8080/api/v1';
+  private readonly baseUrl = this.resolveBaseUrl();
   private readonly sessionKey = 'latexb-session-id';
   private readonly pendingKey = 'latexb-payment-pending';
   private readonly orderKey = 'latexf-payment-order-id';
@@ -45,7 +51,10 @@ export class ApiService {
   clearSession(): void { localStorage.removeItem(this.sessionKey); localStorage.removeItem(this.pendingKey); localStorage.removeItem(this.orderKey); localStorage.removeItem(this.profileKey); }
   saveProfile(profile: UserProfile): void { localStorage.setItem(this.profileKey, JSON.stringify(profile)); }
   cachedProfile(): UserProfile | null { try { const value = localStorage.getItem(this.profileKey); return value ? JSON.parse(value) as UserProfile : null; } catch { return null; } }
-  saveOrderId(response: any): void { const id = response?.orderId || response?.id || response?.data?.orderId || response?.data?.id; if (id) localStorage.setItem(this.orderKey, String(id)); }
+  saveOrderId(response: any): void {
+    const id = response?.orderId || response?.order_id || response?.id || response?.data?.orderId || response?.data?.order_id || response?.data?.id;
+    if (id) localStorage.setItem(this.orderKey, String(id));
+  }
   orderId(): string { return localStorage.getItem(this.orderKey) || ''; }
   extractPaymentStatus(response: any): PaymentStatus {
     const value = response?.data ?? response ?? {};
@@ -55,6 +64,11 @@ export class ApiService {
   setPaymentPending(): void { localStorage.setItem(this.pendingKey, 'true'); }
   clearPaymentPending(): void { localStorage.removeItem(this.pendingKey); }
   paymentPending(): boolean { return localStorage.getItem(this.pendingKey) === 'true'; }
+  private resolveBaseUrl(): string {
+    const configured = window.__LATEXF_CONFIG__?.apiBaseUrl?.trim().replace(/\/+$/, '');
+    if (configured) return configured.endsWith('/api/v1') ? configured : `${configured}/api/v1`;
+    return Capacitor.isNativePlatform() ? 'http://10.0.2.2:8080/api/v1' : '/api/v1';
+  }
   private unwrap<T>(response: T | { data: T }): T { return (response && typeof response === 'object' && 'data' in response) ? response.data : response as T; }
   private withTimeout<T>(request: Observable<T>): Observable<T> { return request.pipe(timeout({ each: 10000 })); }
 }

@@ -156,11 +156,13 @@ export class App implements OnInit, OnDestroy {
         this.paymentPlan.set(plan);
         this.api.createPaymentOrder({ gateway: 'CASHFREE', mobileNumber: this.profile()?.mobileNumber ?? '' }).subscribe({
           next: (response) => {
-            const order = (response?.data ?? response) as CashfreeOrder;
+            const order = (response?.data ?? response) as CashfreeOrder & { payment_session_id?: string; order_id?: string };
             this.cashfreeOrder.set(order);
-            this.paymentSessionId.set(String(order.paymentSessionId ?? ''));
+            const paymentSessionId = order.paymentSessionId ?? order.payment_session_id ?? '';
+            this.paymentSessionId.set(String(paymentSessionId));
             this.api.saveOrderId(order);
             this.loading.set(false);
+            if (!paymentSessionId) this.error.set('Payment checkout is not ready because the server did not return a payment session.');
           },
           error: (e) => this.fail(e, 'Unable to create the payment order.')
         });

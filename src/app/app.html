@@ -4,7 +4,9 @@
       <span class="brand-mark"><mat-icon>eco</mat-icon></span>
       <span><strong>LATEXF</strong><small>{{ 'brandTagline' | translate }}</small></span>
     </a>
-    <select class="language-select" [value]="language.language()" (change)="language.setLanguage($any($event.target).value)" aria-label="Select language"><option value="en">English</option><option value="ta">தமிழ்</option><option value="ml">മലയാളം</option></select>
+    @if (view() !== 'auth') {
+      <select class="language-select" [value]="language.language()" (change)="language.setLanguage($any($event.target).value)" aria-label="Select language"><option value="en">English</option><option value="ta">தமிழ்</option><option value="ml">മലയാളം</option></select>
+    }
     @if (view() === 'home' || view() === 'payment' || view() === 'monthly') {
       <div class="top-actions"><span class="live-dot"></span><span class="desktop-only">{{ 'market' | translate }}</span><button mat-stroked-button class="logout-button" (click)="logout()"><mat-icon>logout</mat-icon> {{ 'logout' | translate }}</button></div>
     }
@@ -36,6 +38,7 @@
               <button mat-flat-button class="primary-button" type="submit" [disabled]="loading()">{{ 'createAccount' | translate }} <mat-icon>arrow_forward</mat-icon></button>
             </form></mat-tab>
           </mat-tab-group>
+          <div class="auth-language"><select class="language-select" [value]="language.language()" (change)="language.setLanguage($any($event.target).value)" aria-label="Select language"><option value="en">English</option><option value="ta">தமிழ்</option><option value="ml">മലയാളം</option></select></div>
           @if (error()) { <div class="error-message"><mat-icon>error_outline</mat-icon>{{ error() }}</div> }
         </mat-card>
       </section>
@@ -53,7 +56,7 @@
         <section class="info-grid"><mat-card class="alert-card"><div class="card-icon green"><mat-icon>notifications_active</mat-icon></div><div><span class="card-overline">{{ 'smsAlerts' | translate }}</span><h3>{{ smsEnabled() ? ('smsEnabled' | translate) : ('smsNotEnabled' | translate) }}</h3><p>{{ smsEnabled() ? ('smsEnabledCopy' | translate) : ('smsNotEnabledCopy' | translate) }}</p><strong>Valid until {{ expiryDate() }}</strong></div><mat-icon class="check-icon">{{ smsEnabled() ? 'check_circle' : 'info' }}</mat-icon></mat-card><mat-card class="profile-card"><div class="card-overline">{{ 'profile' | translate }}</div><p><mat-icon>person</mat-icon>{{ user.name }}</p><p><mat-icon>phone</mat-icon>{{ user.mobileNumber }}</p><p><mat-icon>place</mat-icon>{{ user.district }}, {{ user.state }}</p><button mat-stroked-button (click)="logout()">{{ 'signOut' | translate }}</button></mat-card></section>
       } @else {
         <section class="locked-hero"><div class="lock-illustration"><mat-icon>{{ isPlanPending() ? 'schedule' : 'lock' }}</mat-icon></div><div><span class="card-overline">{{ isPlanPending() ? 'PAYMENT PENDING' : 'PRICE ACCESS' }}</span><h2>{{ isPlanPending() ? 'Your daily price is waiting for approval.' : 'Your daily price is waiting.' }}</h2><p>{{ isPlanPending() ? 'Check after sometime. Post approval, you will receive the rubber price rate as an SMS.' : 'Subscribe to unlock today\'s rubber price and receive SMS alerts throughout the month. Post approval, you will receive the rubber price rate as an SMS.' }}</p>@if (!hasPaymentRecord()) { <button mat-flat-button class="primary-button" (click)="openPayment()">Subscribe for ₹{{ planAmount() }} <mat-icon>arrow_forward</mat-icon></button> }</div></section>
-        <mat-card class="profile-card locked-profile"><div class="card-overline">{{ 'account' | translate }}</div><p><mat-icon>person</mat-icon>{{ user.name }}</p><p><mat-icon>phone</mat-icon>{{ user.mobileNumber }}</p><p><mat-icon>place</mat-icon>{{ user.address }}, {{ user.district }}</p></mat-card>
+        <mat-card class="profile-card locked-profile"><div class="card-overline">{{ 'account' | translate }}</div><p><mat-icon>person</mat-icon>{{ user.name }}</p><p><mat-icon>phone</mat-icon>{{ user.mobileNumber }}</p><p><mat-icon>place</mat-icon>{{ user.address }}, {{ user.district }}</p><button mat-stroked-button (click)="logout()">{{ 'signOut' | translate }}</button></mat-card>
         @if (isPending()) { <div class="pending-banner"><mat-icon>schedule</mat-icon><div><strong>Payment under review</strong><span>Your subscription will be enabled as soon as our admin confirms your payment.</span></div><button mat-button (click)="checkPaymentStatus()">Check status</button></div> }
       }
     </main>
