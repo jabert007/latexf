@@ -39,9 +39,9 @@ Configure the Pages project with:
 
 Before deploying, set `public/config.js` to the Railway backend origin, or use
 the same file as a deployment-specific runtime asset. The included
-`public/_redirects` file keeps Angular routes working on refresh.
+`wrangler.jsonc` enables SPA fallback so Angular routes keep working on refresh.
 
-The Railway API must allow the Cloudflare Pages domain in CORS and serve HTTPS.
+The Railway API must allow the Cloudflare Pages/Worker domain in CORS and serve HTTPS.
 The frontend cannot safely proxy or hide backend secrets; authentication and
 payment credentials belong on Railway.
 
