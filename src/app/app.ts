@@ -45,7 +45,9 @@ export class App implements OnInit, OnDestroy {
   readonly cashfreeOrder = signal<CashfreeOrder | null>(null);
   readonly paymentSessionId = signal('');
   readonly error = signal('');
-  readonly whatsappNumber = '919842630047';
+  readonly whatsappNumber = '919487659212';
+  readonly contactEmail = 'latexf58@gmail.com';
+  readonly contactMobile = '+919487659212';
   readonly whatsappMessage = 'I am planning to sell rubber sheets';
   private readonly inactivityLimitMs = 15 * 60 * 1000;
   private inactivityTimer?: ReturnType<typeof setTimeout>;
