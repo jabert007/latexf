@@ -69,5 +69,13 @@
   @if (view() === 'monthly') {
     <main class="monthly-page page-width"><button mat-button class="back-button" (click)="backToHome()"><mat-icon>arrow_back</mat-icon> Back to dashboard</button><div class="monthly-heading"><div><div class="eyebrow">MONTHLY RUBBER PRICES</div><h1>Rubber price history.</h1><p>Prices returned for your selected month.</p></div><div class="monthly-filters"><select [value]="monthlyMonth()" (change)="changeMonthlyMonth($any($event.target).value)">@for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) { <option [value]="month">{{ month }}</option> }</select><select [value]="monthlyYear()" (change)="changeMonthlyYear($any($event.target).value)">@for (year of [2024,2025,2026,2027]; track year) { <option [value]="year">{{ year }}</option> }</select></div></div><mat-card class="monthly-card"><div class="monthly-table-head"><span>Date</span><span>Quality</span><span>Price</span></div>@if (loading()) { <div class="monthly-empty">Loading prices…</div> } @else if (!monthlyPrices().length) { <div class="monthly-empty">No prices found for this month.</div> } @else { @for (item of monthlyPrices(); track item.id + '-' + item.quality) { <div class="monthly-row"><span>{{ item.priceDate }}</span><strong>{{ item.quality }}</strong><b>₹{{ item.price | number:'1.2-2' }}</b></div> } }</mat-card></main>
   }
-  <footer><span>© 2026 LATEXF</span><span>Built for the people who grow tomorrow.</span></footer>
+  <footer>
+    <span>© 2026 LATEXF</span>
+    <nav class="footer-links" aria-label="Footer links">
+      <a [href]="'mailto:' + contactEmail">Contact Us</a><span aria-hidden="true">•</span>
+      <a href="#terms">Terms &amp; Conditions</a><span aria-hidden="true">•</span>
+      <a href="#refunds">Refunds &amp; Cancellations</a>
+    </nav>
+    <span>Built for the people who grow tomorrow.</span>
+  </footer>
 </div>
