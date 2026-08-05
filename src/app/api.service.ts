@@ -22,7 +22,7 @@ export class ApiService {
   private readonly pendingKey = 'latexb-payment-pending';
   private readonly orderKey = 'latexf-payment-order-id';
   private readonly profileKey = 'latexf-profile';
-  private readonly requestTimeoutMs = 45000;
+  private readonly requestTimeoutMs = 120000;
   private headers(): HttpHeaders { const id = localStorage.getItem(this.sessionKey); return id ? new HttpHeaders({ 'X-Session-Id': id }) : new HttpHeaders(); }
   register(body: object): Observable<unknown> { return this.withTimeout(this.http.post(`${this.baseUrl}/auth/register`, body)); }
   login(body: object): Observable<any> { return this.withTimeout(this.http.post(`${this.baseUrl}/auth/login`, body)); }
