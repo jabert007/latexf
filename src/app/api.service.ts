@@ -22,6 +22,7 @@ export class ApiService {
   private readonly pendingKey = 'latexb-payment-pending';
   private readonly orderKey = 'latexf-payment-order-id';
   private readonly profileKey = 'latexf-profile';
+  private readonly requestTimeoutMs = 45000;
   private headers(): HttpHeaders { const id = localStorage.getItem(this.sessionKey); return id ? new HttpHeaders({ 'X-Session-Id': id }) : new HttpHeaders(); }
   register(body: object): Observable<unknown> { return this.withTimeout(this.http.post(`${this.baseUrl}/auth/register`, body)); }
   login(body: object): Observable<any> { return this.withTimeout(this.http.post(`${this.baseUrl}/auth/login`, body)); }
@@ -70,5 +71,5 @@ export class ApiService {
     return Capacitor.isNativePlatform() ? 'http://10.0.2.2:8080/api/v1' : '/api/v1';
   }
   private unwrap<T>(response: T | { data: T }): T { return (response && typeof response === 'object' && 'data' in response) ? response.data : response as T; }
-  private withTimeout<T>(request: Observable<T>): Observable<T> { return request.pipe(timeout({ each: 10000 })); }
+  private withTimeout<T>(request: Observable<T>): Observable<T> { return request.pipe(timeout({ each: this.requestTimeoutMs })); }
 }

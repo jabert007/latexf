@@ -304,6 +304,10 @@ export class App implements OnInit, OnDestroy {
   private notify(message: string): void { this.snack.open(message, 'Close', { duration: 4500, panelClass: ['latex-snack'] }); }
   private fail(error: any, fallback: string): void {
     this.loading.set(false);
+    if (error?.name === 'TimeoutError') {
+      this.error.set('The server is waking up or taking longer than usual. Please try again in a moment.');
+      return;
+    }
     const serverMessage = error?.error?.message || error?.error?.error || error?.message;
     this.error.set(serverMessage || fallback);
   }
