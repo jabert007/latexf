@@ -20,6 +20,8 @@ window.__LATEXF_CONFIG__ = {
 };
 ```
 
+For the current Render backend, use `https://latexb.onrender.com`.
+
 The value may be the Railway origin or the complete `/api/v1` URL. Do not put
 credentials or secrets in this file; it is public browser code.
 
