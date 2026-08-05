@@ -22,6 +22,10 @@ window.__LATEXF_CONFIG__ = {
 
 For the current Render backend, use `https://latexb.onrender.com`.
 
+For a Cloudflare Worker deployment, run `npx wrangler deploy` after the build.
+The committed `wrangler.jsonc` points Wrangler to the Angular browser output and
+enables SPA fallback routing.
+
 The value may be the Railway origin or the complete `/api/v1` URL. Do not put
 credentials or secrets in this file; it is public browser code.
 
